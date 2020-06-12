@@ -56,7 +56,7 @@ while True:
     print("Listening...")
     voice_data = record_audio()
 
-    if voice_data.count(wake_word) > 0:
+    if wake_word in voice_data:
         steve_speak('How can I help you?')
         voice_data = record_audio()
         respond(voice_data)
