@@ -9,6 +9,7 @@ from time import ctime
 
 r = sr.Recognizer()
 
+#Recording the voice
 def record_audio():
     with sr.Microphone() as source:
         audio = r.listen(source)
@@ -21,7 +22,13 @@ def record_audio():
             steve_speak('Can not connect to the internet')
         return voice_data.lower()
 
+# 
+def there_exists(terms):
+    for term in terms:
+        if term in voice_data:
+            return True
 
+# Recording the voice 
 def steve_speak(audio_string):
     tts = gTTS(text=audio_string, lang='en')
     r = random.randint(1, 1000000)
@@ -31,25 +38,35 @@ def steve_speak(audio_string):
     print(audio_string)
     os.remove(audio_file)
 
+# Responding to the voice
 def respond(voice_data):
+    # Name
     if 'what is your name' in voice_data:
         steve_speak('My name is Steve')
+
+    # Time
     if 'what time is it' in voice_data:
         steve_speak(ctime())
-    if 'search' in voice_data:
-        search = record_audio('What do you want to search for')
-        url = 'https://google.com/search?q=' + search
+
+    # Google
+    if there_exists(["search for"]) and 'youtube' not in voice_data:
+        search_term = voice_data.split("for")[-1]
+        url = f"https://google.com/search?q={search_term}"
         webbrowser.get().open(url)
-        steve_speak('Here is what I found for ' + search)
-    if 'find location' in voice_data:
-        location = record_audio('What is the location')
-        url = 'https://google.nl/maps/place/' + location
+        steve_speak(f'Here is what I found for {search_term} on google')
+
+    # Location
+    if there_exists(["where is"]):
+        search_term = voice_data.split("is")[-1]
+        url = f"https://google.nl/maps/place/{search_term}"
         webbrowser.get().open(url)
-        steve_speak('Here is the location of ' + location)
+        steve_speak(f'Here is the location of {search_term}')
+    # Leave
     if 'exit' in voice_data:
         steve_speak('Goodbye')
         exit()
 
+# Running the program
 wake_word = "hey steve"
 
 while True:
